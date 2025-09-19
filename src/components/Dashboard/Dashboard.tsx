@@ -1,17 +1,31 @@
 import React from 'react';
-import { useAppSelector } from '../../store';
+import { useAppSelector, useAppDispatch } from '../../store';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { QuickInsightCards } from './QuickInsightCards';
 import { RoomOverview } from './RoomOverview';
 import { ProgressChart } from './ProgressChart';
 import { CurrentSprint } from './CurrentSprint';
+import { startNewSprint, addDailyProgress } from '../../store/slices/sprintsSlice';
+import { addPoints } from '../../store/slices/motivationSlice';
+import { OrganizationSprint, DailyProgress } from '../../types';
 
 interface DashboardProps {
   onStartAssessment: () => void;
+  onStartSprint?: () => void;
+  onPlanSprint?: () => void;
+  onLogProgress?: () => void;
+  onMindfulReview?: () => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ onStartAssessment }) => {
+export const Dashboard: React.FC<DashboardProps> = ({
+  onStartAssessment,
+  onStartSprint,
+  onPlanSprint,
+  onLogProgress,
+  onMindfulReview
+}) => {
+  const dispatch = useAppDispatch();
   const rooms = useAppSelector(state => state.rooms.rooms);
   const currentSprint = useAppSelector(state => state.sprints.currentSprint);
   const analytics = useAppSelector(state => state.analytics);
@@ -22,6 +36,66 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartAssessment }) => {
     room.currentState.clutterLevel <= 3 &&
     room.currentState.functionalityScore >= 8
   ).length;
+
+  const handleStartSprint = () => {
+    if (onStartSprint) {
+      onStartSprint();
+    } else {
+      // Default action: create a basic sprint
+      const newSprint: OrganizationSprint = {
+        sprintNumber: 1,
+        duration: 14, // 2 weeks
+        targetRooms: Object.keys(rooms).slice(0, 3), // First 3 rooms
+        sprintGoal: "Initial home organization sprint",
+        backlogItems: [],
+        velocityMetrics: {
+          itemsProcessed: 0,
+          roomsCompleted: 0,
+          satisfactionScore: 0,
+        },
+        impediments: [],
+        dailyProgress: [],
+      };
+      dispatch(startNewSprint(newSprint));
+    }
+  };
+
+  const handleLogProgress = () => {
+    if (onLogProgress) {
+      onLogProgress();
+    } else {
+      // Default action: log basic progress for today
+      const todayProgress: DailyProgress = {
+        date: new Date(),
+        itemsProcessed: 10, // Default values
+        hoursWorked: 1,
+        roomsWorkedOn: Object.keys(rooms).slice(0, 1),
+        satisfactionLevel: 7,
+        energyLevel: 7,
+        notes: "Daily organization progress logged",
+      };
+      dispatch(addDailyProgress(todayProgress));
+      dispatch(addPoints(10)); // Reward for logging progress
+    }
+  };
+
+  const handlePlanSprint = () => {
+    if (onPlanSprint) {
+      onPlanSprint();
+    } else {
+      // Fallback: Could open a simple planning interface or alert
+      alert("Sprint planning feature coming soon! For now, use 'Start Sprint' to begin with default settings.");
+    }
+  };
+
+  const handleMindfulReview = () => {
+    if (onMindfulReview) {
+      onMindfulReview();
+    } else {
+      // Fallback: Could open a simple review interface or alert
+      alert("Mindful review feature coming soon! Take a moment to reflect on your progress and set intentions.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-zen-50">
@@ -41,7 +115,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartAssessment }) => {
               <Button onClick={onStartAssessment}>
                 + Assess Room
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleStartSprint}>
                 Start Sprint
               </Button>
             </div>
@@ -157,13 +231,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartAssessment }) => {
                   >
                     📝 Assess a Room
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button variant="outline" className="w-full justify-start" onClick={handlePlanSprint}>
                     🎯 Plan Sprint
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button variant="outline" className="w-full justify-start" onClick={handleLogProgress}>
                     📸 Log Progress
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button variant="outline" className="w-full justify-start" onClick={handleMindfulReview}>
                     🧘 Mindful Review
                   </Button>
                 </div>
