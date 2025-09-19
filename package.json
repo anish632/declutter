@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://anish632.github.io/declutter",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@headlessui/react": "^2.2.8",
     "@heroicons/react": "^2.2.0",
     "@reduxjs/toolkit": "^2.9.0",
