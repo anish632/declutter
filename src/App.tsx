@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Provider } from 'react-redux';
-import { store } from './store';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './store';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { RoomAssessmentForm } from './components/RoomAssessment/RoomAssessmentForm';
 import { Button } from './components/ui/Button';
@@ -106,9 +107,11 @@ function App() {
 
   return (
     <Provider store={store}>
-      <div className="App">
-        {renderContent()}
-      </div>
+      <PersistGate loading={null} persistor={persistor}>
+        <div className="App">
+          {renderContent()}
+        </div>
+      </PersistGate>
     </Provider>
   );
 }

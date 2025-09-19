@@ -6,6 +6,7 @@ import { QuickInsightCards } from './QuickInsightCards';
 import { RoomOverview } from './RoomOverview';
 import { ProgressChart } from './ProgressChart';
 import { CurrentSprint } from './CurrentSprint';
+import { OrganizationSuggestions } from './OrganizationSuggestions';
 import { startNewSprint, addDailyProgress } from '../../store/slices/sprintsSlice';
 import { addPoints } from '../../store/slices/motivationSlice';
 import { OrganizationSprint, DailyProgress } from '../../types';
@@ -216,6 +217,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </div>
               </CardContent>
             </Card>
+
+            {/* Organization Suggestions */}
+            <OrganizationSuggestions />
 
             {/* Quick Actions */}
             <Card className="dashboard-card">
