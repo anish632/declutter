@@ -166,7 +166,7 @@ class GeminiService {
     Provide your response as JSON with this exact structure:
     {
       "overallScore": number (0-100),
-      "recommendation": "keep" | "donate" | "discard" | "needs_review",
+      "recommendation": "keep" | "donate" | "discard" | "undecided",
       "confidence": number (0-100),
       "reasoning": ["reason1", "reason2", "reason3"],
       "criteriaBreakdown": {
@@ -186,7 +186,7 @@ class GeminiService {
 
       return {
         overallScore: parsed.overallScore || 50,
-        recommendation: parsed.recommendation || 'needs_review',
+        recommendation: parsed.recommendation || 'undecided',
         confidence: parsed.confidence || 50,
         reasoning: parsed.reasoning || ['Analysis unavailable'],
         criteriaBreakdown: parsed.criteriaBreakdown || this.getDefaultCriteria(),
@@ -200,7 +200,7 @@ class GeminiService {
   private getFallbackDecision(item?: Partial<ItemCategory>): DecisionScore {
     return {
       overallScore: 50,
-      recommendation: 'needs_review',
+      recommendation: 'undecided',
       confidence: 30,
       reasoning: ['Unable to analyze at this time', 'Please review manually'],
       criteriaBreakdown: this.getDefaultCriteria(),

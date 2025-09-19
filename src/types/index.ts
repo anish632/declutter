@@ -160,7 +160,7 @@ export interface DecisionCriteria {
 export interface DecisionScore {
   overallScore: number; // 0-100
   criteriaBreakdown: DecisionCriteria;
-  recommendation: 'keep' | 'donate' | 'discard' | 'needs_review';
+  recommendation: 'keep' | 'donate' | 'discard' | 'undecided';
   confidence: number; // 0-100
   reasoning: string[];
 }
