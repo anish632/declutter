@@ -9,7 +9,7 @@ import { CurrentSprint } from './CurrentSprint';
 import { OrganizationSuggestions } from './OrganizationSuggestions';
 import { startNewSprint, addDailyProgress } from '../../store/slices/sprintsSlice';
 import { addPoints } from '../../store/slices/motivationSlice';
-import { OrganizationSprint, DailyProgress } from '../../types';
+import { OrganizationSprint, DailyProgress, RoomAssessment } from '../../types';
 
 interface DashboardProps {
   onStartAssessment: () => void;
@@ -17,6 +17,7 @@ interface DashboardProps {
   onPlanSprint?: () => void;
   onLogProgress?: () => void;
   onMindfulReview?: () => void;
+  onUpdateRoom?: (room: RoomAssessment) => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -24,7 +25,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onStartSprint,
   onPlanSprint,
   onLogProgress,
-  onMindfulReview
+  onMindfulReview,
+  onUpdateRoom
 }) => {
   const dispatch = useAppDispatch();
   const rooms = useAppSelector(state => state.rooms.rooms);
@@ -154,7 +156,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <CardTitle>Room Status Overview</CardTitle>
               </CardHeader>
               <CardContent>
-                <RoomOverview rooms={rooms} />
+                <RoomOverview rooms={rooms} onUpdateRoom={onUpdateRoom} />
               </CardContent>
             </Card>
           </div>

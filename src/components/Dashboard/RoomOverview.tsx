@@ -1,11 +1,13 @@
 import React from 'react';
 import { RoomAssessment } from '../../types';
+import { Button } from '../ui/Button';
 
 interface RoomOverviewProps {
   rooms: { [roomId: string]: RoomAssessment };
+  onUpdateRoom?: (room: RoomAssessment) => void;
 }
 
-export const RoomOverview: React.FC<RoomOverviewProps> = ({ rooms }) => {
+export const RoomOverview: React.FC<RoomOverviewProps> = ({ rooms, onUpdateRoom }) => {
   const roomArray = Object.values(rooms);
 
   if (roomArray.length === 0) {
@@ -124,6 +126,18 @@ export const RoomOverview: React.FC<RoomOverviewProps> = ({ rooms }) => {
                 </div>
               </div>
             )}
+
+            {/* Update Progress Button */}
+            <div className="mt-4 pt-3 border-t border-zen-200">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onUpdateRoom?.(room)}
+                className="w-full"
+              >
+                📊 Update Progress
+              </Button>
+            </div>
           </div>
         );
       })}

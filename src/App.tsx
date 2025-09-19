@@ -4,11 +4,15 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './store';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { RoomAssessmentForm } from './components/RoomAssessment/RoomAssessmentForm';
+import { MindfulReview } from './components/MindfulReview/MindfulReview';
+import { RoomProgressUpdate } from './components/RoomProgress/RoomProgressUpdate';
 import { Button } from './components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from './components/ui/Card';
+import { RoomAssessment } from './types';
 
 function App() {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'assessment' | 'welcome'>('welcome');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'assessment' | 'welcome' | 'mindful-review' | 'room-progress'>('welcome');
+  const [selectedRoom, setSelectedRoom] = useState<RoomAssessment | null>(null);
 
   const renderWelcome = () => (
     <div className="min-h-screen zen-gradient flex items-center justify-center p-4">
@@ -97,9 +101,29 @@ function App() {
           <div className="min-h-screen bg-zen-50">
             <Dashboard
               onStartAssessment={() => setCurrentView('assessment')}
+              onMindfulReview={() => setCurrentView('mindful-review')}
+              onUpdateRoom={(room) => {
+                setSelectedRoom(room);
+                setCurrentView('room-progress');
+              }}
             />
           </div>
         );
+      case 'mindful-review':
+        return (
+          <MindfulReview
+            onComplete={() => setCurrentView('dashboard')}
+            onCancel={() => setCurrentView('dashboard')}
+          />
+        );
+      case 'room-progress':
+        return selectedRoom ? (
+          <RoomProgressUpdate
+            room={selectedRoom}
+            onComplete={() => setCurrentView('dashboard')}
+            onCancel={() => setCurrentView('dashboard')}
+          />
+        ) : null;
       default:
         return renderWelcome();
     }
