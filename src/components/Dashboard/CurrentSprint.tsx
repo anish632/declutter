@@ -1,12 +1,91 @@
-import React from 'react';
-import { OrganizationSprint } from '../../types';
+import React, { useState } from 'react';
+import { OrganizationSprint, BacklogItem } from '../../types';
 import { Button } from '../ui/Button';
+import { useAppDispatch } from '../../store';
+import { addBacklogItem, startNewSprint } from '../../store/slices/sprintsSlice';
 
 interface CurrentSprintProps {
   sprint: OrganizationSprint | null;
+  onStartSprint?: () => void;
+  onViewDetails?: () => void;
 }
 
-export const CurrentSprint: React.FC<CurrentSprintProps> = ({ sprint }) => {
+export const CurrentSprint: React.FC<CurrentSprintProps> = ({
+  sprint,
+  onStartSprint,
+  onViewDetails
+}) => {
+  const dispatch = useAppDispatch();
+  const [showAddItemForm, setShowAddItemForm] = useState(false);
+  const [newItemDescription, setNewItemDescription] = useState('');
+
+  const handleStartNewSprint = () => {
+    if (onStartSprint) {
+      onStartSprint();
+    } else {
+      // Default action: create a basic sprint
+      const newSprint: OrganizationSprint = {
+        sprintNumber: 1,
+        duration: 14,
+        targetRooms: ['bedroom', 'kitchen', 'living_room'],
+        sprintGoal: "Initial home organization sprint",
+        backlogItems: [],
+        velocityMetrics: {
+          itemsProcessed: 0,
+          roomsCompleted: 0,
+          satisfactionScore: 0,
+        },
+        impediments: [],
+        dailyProgress: [],
+      };
+      dispatch(startNewSprint(newSprint));
+    }
+  };
+
+  const handleViewDetails = () => {
+    if (onViewDetails) {
+      onViewDetails();
+    } else {
+      // Default action: show detailed sprint information
+      alert(
+        `Sprint #${sprint?.sprintNumber} Details:\n\n` +
+        `Goal: ${sprint?.sprintGoal}\n` +
+        `Duration: ${sprint?.duration} days\n` +
+        `Target Rooms: ${sprint?.targetRooms.join(', ')}\n` +
+        `Backlog Items: ${sprint?.backlogItems.length}\n` +
+        `Items Processed: ${sprint?.velocityMetrics.itemsProcessed}\n` +
+        `Satisfaction Score: ${sprint?.velocityMetrics.satisfactionScore}/10`
+      );
+    }
+  };
+
+  const handleAddItem = () => {
+    setShowAddItemForm(true);
+  };
+
+  const handleSubmitNewItem = () => {
+    if (newItemDescription.trim() && sprint) {
+      const newItem: BacklogItem = {
+        id: `item_${Date.now()}`,
+        description: newItemDescription.trim(),
+        storyPoints: 3, // Default medium complexity
+        priority: 'medium',
+        acceptanceCriteria: ['Item processed and decision made'],
+        roomAssignment: sprint.targetRooms[0] || 'general',
+        estimatedHours: 1,
+      };
+
+      dispatch(addBacklogItem(newItem));
+      setNewItemDescription('');
+      setShowAddItemForm(false);
+    }
+  };
+
+  const handleCancelAddItem = () => {
+    setNewItemDescription('');
+    setShowAddItemForm(false);
+  };
+
   if (!sprint) {
     return (
       <div className="text-center py-6">
@@ -15,7 +94,7 @@ export const CurrentSprint: React.FC<CurrentSprintProps> = ({ sprint }) => {
         <p className="text-zen-600 text-sm mb-4">
           Start a focused organization sprint to tackle specific rooms and goals.
         </p>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={handleStartNewSprint}>
           Start New Sprint
         </Button>
       </div>
@@ -93,11 +172,34 @@ export const CurrentSprint: React.FC<CurrentSprintProps> = ({ sprint }) => {
         </div>
       </div>
 
+      {/* Add Item Form */}
+      {showAddItemForm && (
+        <div className="border border-zen-300 rounded-lg p-3 bg-zen-50">
+          <h4 className="font-medium text-zen-800 mb-2">Add Backlog Item</h4>
+          <input
+            type="text"
+            value={newItemDescription}
+            onChange={(e) => setNewItemDescription(e.target.value)}
+            placeholder="Describe the organization task..."
+            className="w-full p-2 border border-zen-300 rounded text-sm mb-2"
+            autoFocus
+          />
+          <div className="flex space-x-2">
+            <Button size="sm" onClick={handleSubmitNewItem}>
+              Add Item
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleCancelAddItem}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="flex space-x-2 pt-2">
-        <Button variant="outline" size="sm" className="flex-1">
+        <Button variant="outline" size="sm" className="flex-1" onClick={handleViewDetails}>
           View Details
         </Button>
-        <Button variant="outline" size="sm" className="flex-1">
+        <Button variant="outline" size="sm" className="flex-1" onClick={handleAddItem}>
           Add Item
         </Button>
       </div>
